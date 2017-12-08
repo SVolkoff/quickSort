@@ -31,6 +31,8 @@ private:
 	unsigned int const max_threads_count_;
 	stack<chunk_to_sort_t> chunks_;
 	std::atomic<bool> end_of_data_;
+	mutable std::mutex mutex_;
+
 };
 
 template <typename BidirectionalIterator>
@@ -53,11 +55,11 @@ do_sort(BidirectionalIterator first, BidirectionalIterator last)
 {
 	if (first >= last)
 		return;
-	auto pivot = partition(first, last);
-	auto first_chunk = std::make_shared<chunk_to_sort_t>(chunk_to_sort_t(first, pivot));
+	auto part_ptr = partition(first, last);
+	auto first_chunk = std::make_shared<chunk_to_sort_t>(chunk_to_sort_t(first, part_ptr));
 	auto first_task = first_chunk->promise.get_future();
 	chunks_.push(first_chunk);
-	do_sort(pivot, last);
+	do_sort(part_ptr, last);
 
 	while (first_task.wait_for(std::chrono::seconds(0)) != std::future_status::ready)
 		sort_thread();
