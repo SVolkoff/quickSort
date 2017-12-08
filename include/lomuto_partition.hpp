@@ -1,6 +1,16 @@
 #include <iostream>
 
-template<class Iterator>
+template <typename Iterator>
+void quickSort(Iterator first, Iterator last)
+{
+	if (first < right)
+	{
+		auto p = partition(first, last);
+		quickSort(first, p - 1);
+		quickSort(p + 1, last);
+	}
+}
+<class Iterator>
 Iterator partition(Iterator first, Iterator last) 
 {
 
@@ -11,7 +21,7 @@ Iterator partition(Iterator first, Iterator last)
 		if (*j <= pivot) 
 		{
 			++i;
-			std::iter_swap(i, j);
+			std::iter_swap(*i, *j);
 		}
 	}
 	std::iter_swap(i + 1, last);
